@@ -1,0 +1,16 @@
+subject,level,question,a,b,c,d,correct,answered
+History,100,Who was the first President of the United States?,George Washington,Thomas Jefferson,Abraham Lincoln,John Adams,a,N
+History,200,In what year did World War II end?,1940,1945,1939,1950,b,N
+History,300,What empire was ruled by Julius Caesar?,Greek,Ottoman,Roman,Byzantine,c,N
+History,400,What number was the Apollo mission that successfully put a man on the moon for the first time in human history? ,Apollo10,Apollo11,Apollo12,Apollo13,b,N
+History,500,Where was tea invented,England,USA,China,Japan,c,N
+Geography,100,What is the capital of France?,Berlin,Rome,Madrid,Paris,d,N
+Geography,200,Which continent is the Sahara Desert located in?,Asia,South America,Africa,Australia,c,N
+Geography,300,Which river runs through Egypt?,Amazon,Nile,Danube,Mississippi,b,N
+Geography,400,What country has the most natural lakes?,Canada,Russia,USA,India,a,N
+Geography,500,Mount Everest is located in which mountain range?,Andes,Alps,Rockies,Himalayas,d,N
+Computer,100,What does CPU stand for?,Central Processing Unit,Computer Personal Unit,Central Print Unit,Control Panel Utility,a,N
+Computer,200,Which company developed Windows?,Apple,IBM,Microsoft,Google,c,N
+Computer,300,Which of these is a programming language?,HTTP,HTML,CPU,RAM,b,N
+Computer,400,What is the name of the first electronic computer?,ENIAC,UNIVAC,MAC,IBM 360,a,N
+Computer,500,"In binary code, what does the digit 1 represent?",Off,Error,On,Reset,c,N
