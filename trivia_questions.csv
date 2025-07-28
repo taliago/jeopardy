@@ -2,7 +2,7 @@ subject,level,question,a,b,c,d,correct,answered
 History,100,Who was the first President of the United States?,George Washington,Thomas Jefferson,Abraham Lincoln,John Adams,a,N
 History,200,In what year did World War II end?,1940,1945,1939,1950,b,N
 History,300,What empire was ruled by Julius Caesar?,Greek,Ottoman,Roman,Byzantine,c,N
-History,400,What number was the Apollo mission that successfully put a man on the moon for the first time in human history? ,Apollo10,Apollo11,Apollo12,Apollo13,b,N
+History,400,What number was the Apollo mission that successfully put a man on the moon for the first time in human history?ï¿½,Apollo10,Apollo11,Apollo12,Apollo13,b,N
 History,500,Where was tea invented,England,USA,China,Japan,c,N
 Geography,100,What is the capital of France?,Berlin,Rome,Madrid,Paris,d,N
 Geography,200,Which continent is the Sahara Desert located in?,Asia,South America,Africa,Australia,c,N
