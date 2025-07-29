@@ -1,0 +1,16 @@
+Will be deleted at the end.
+
+Here is a to-do list, so we don't forget anything:
+
+DONE: 
+ - Server activation
+ - Model\Schema of collection
+
+
+TO-DO:
+ - Load docs from csv to db (loadQuestion.js)
+ - Write logic of the game - in a separate file
+ - Write HTML (index.html)
+ - CSS - optional
+ - comments on all code - optional
+ - Write note that explains the code (ReadMe) - Sara asked to do
