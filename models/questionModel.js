@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// Shema's defenition
+// Schema's definition
 const QuestionSchema = new mongoose.Schema({
     subject: { type: String, enum: ['History', 'Geography', 'Computer'], required: true },
     level: { type: Number, enum: [100, 200, 300, 400, 500], required: true },
@@ -14,5 +14,5 @@ const QuestionSchema = new mongoose.Schema({
 });
 
 // Schema's export
-const Question = mongoose.model('question', QuestionSchema) // question - collection name
+const Question = mongoose.model('questions', QuestionSchema) // questions - collection name
 module.exports = Question;

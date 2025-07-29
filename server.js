@@ -13,7 +13,17 @@ const uri = 'mongodb://127.0.0.1:27017/jeopardy';
     });
 
 // Connect to DB
-mongoose.connect(uri)
+
+async function connectDB() {
+  try {
+    await mongoose.connect(uri);
+      console.log('Connected to MongoDB to db - jeopardy');
+  } catch (err) {
+      console.error('Error connecting to MongoDB: ', err);
+      throw err;
+    }
+
+  /*mongoose.connect(uri)
   .then(async () => {
     console.log('Connected to MongoDB to db - jeopardy');
 
@@ -21,10 +31,13 @@ mongoose.connect(uri)
 
     // Start the server
     app.listen(PORT, () => {
-      console.log('✅ Server running on http://localhost:3000');
+      console.log('Server running on http://localhost:3000');
     });
 
   })
   .catch((err) => {
     console.error('Error connecting to MongoDB: ', err);
-  });
+  });*/
+}
+
+module.exports = connectDB;
