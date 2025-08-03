@@ -1,32 +1,35 @@
-// here will be logic of Inserting data from CSV to question- collection
-// using validation!
-
-// and also important to check if there any data in collection already,
-// to not overwrite it
-
-
 const fs = require('fs');
 const csv = require('csv-parser');
 const mongoose = require('mongoose');
+const path = require('path');
 const Questions = require('../models/questionModel'); // imports schema of collection - questions
-const connectDB = require('../server'); // imports connection to DB model
+// const connectDB = require('../server'); // imports connection to DB model
+// We don't need a server here, bc were call for loadQuestions from the server. 
+// So server is the main part, that connects everything.
 
-
-async function readCSVAndInsert() {   
+async function loadQuestions() {   
     try {
-
-        await connectDB();
     
+        // drops collection if exists - every session is a new game
+
         const collections = await mongoose.connection.db.listCollections({name: 'questions'}).toArray();
         if (collections.length > 0) {
             await mongoose.connection.db.dropCollection('questions');
             console.log('Dropped existing questions collection');
         }
 
+        // inserts data only once - probably not needed
+        /* 
+        const count = await Questions.countDocuments();
+        if (count > 0) {
+            console.log('Questions already exist in db - jeopardy.');
+            return;
+        } */
+
         const questions = [];
 
         await new Promise((resolve, reject) => {
-            fs.createReadStream('../trivia_questions.csv') 
+            fs.createReadStream(path.join(__dirname, '..', 'trivia_questions.csv')) 
             .pipe(csv())
             .on('data', (row) => {
 
@@ -70,21 +73,7 @@ async function readCSVAndInsert() {
         }
     } catch (err) {
         console.error("Unexpected error during CSV import:", err.message);
-    } finally {
-        mongoose.connection.close();
-        console.log("MongoDB connection closed");
     }
-    /*Questions.insertMany(questions, { ordered: false, validateBeforeSave: true }) // inserts docs with validation
-    .then(docs => {
-            console.log("Successfully inserted:", docs.length, "questions");
-        })
-        .catch(err => {
-            console.error("Error inserting questions:", err);
-        })
-        .finally(() => {
-        mongoose.connection.close();
-        });*/
 }
 
-// MAIN
-readCSVAndInsert();
+module.exports = loadQuestions;

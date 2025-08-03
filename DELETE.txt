@@ -1,5 +1,16 @@
 Will be deleted at the end.
 
+package.json & package-lock.json:
+
+GPT suggested that these 2 files are an essential part of any Node.js project.
+ - package.json lists the project's dependencies and metadata.
+ - package-lock.json locks the exact versions to ensure consistency across different environments.
+
+Run " npm install " to install dependencies, 
+make sure MongoDB is running, then do " npm start ".
+
+
+
 Here is a to-do list, so we don't forget anything:
 
 DONE: 
@@ -12,6 +23,8 @@ DONE:
 
 TO-DO:
  - Write logic of the game - in a separate file
+ - In HTML - change color of (levels, themes) depend on there availability
+ - Now coloring is written in script (HTML), maybe we should do it in CSS
  - CSS - optional
  - comments on all code - optional
  - Write note that explains the code (ReadMe) - Sara asked to do
