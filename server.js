@@ -1,31 +1,26 @@
 const express = require('express');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const path = require('path');
+const QA = require('./models/questionModel');
+const connectDB = require('./scripts/db');
 const loadQuestions = require('./scripts/loadQuestions');
 
 const app = express();
 const PORT = 3000;
-const uri = 'mongodb://127.0.0.1:27017/jeopardy';
+
+// Middleware functions
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 
 // Route for HTML page
-    app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-    });
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-// Connect to DB
-
-async function connectDB() {
-  try {
-    await mongoose.connect(uri);
-      console.log('Connected to MongoDB to db - jeopardy');
-  } catch (err) {
-      console.error('Error connecting to MongoDB: ', err);
-      throw err;
-    }
-
-  /*mongoose.connect(uri)
+// Connections
+  connectDB() // it's a separate function, so we keep the server clean and modular
   .then(async () => {
-    console.log('Connected to MongoDB to db - jeopardy');
 
     await loadQuestions(); // upload qa data if needed
 
@@ -37,7 +32,34 @@ async function connectDB() {
   })
   .catch((err) => {
     console.error('Error connecting to MongoDB: ', err);
-  });*/
-}
+    process.exit(1);
+  });
 
-module.exports = connectDB;
+// Check theme availability 
+app.get('/check-subject', async (req, res) => {
+  const subject = req.query.subject;
+  const count = await QA.countDocuments({ subject, answered: 'N' });
+  const isAvailable = count > 0;
+  res.json({ available: isAvailable });
+});
+
+// Check question availability and return it to user
+app.get('/check-level', async (req, res) => {
+  const { subject, level } = req.query;
+  const question = await QA.findOne({ subject, level, answered: 'N' });
+
+  if (question) {
+    res.json({
+      available: true,
+      question: question.question,
+      options: {
+        a: question.optionA,
+        b: question.optionB,
+        c: question.optionC,
+        d: question.optionD,
+      }
+    });
+  } else {
+    res.json({ available: false });
+  }
+});
