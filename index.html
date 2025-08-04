@@ -27,7 +27,8 @@
 
 
         <script>
-            // When user сhooses a theme
+
+            // When user сhooses a subject
             let selectedSubject = null;
 
             document.querySelectorAll('.category-btn').forEach(button => {
@@ -55,7 +56,7 @@
                 .then(data => {
                     if (data.available) {
                     } else {
-                    alert(`All questions on ${selectedSubject} were answered.\nPlease select another theme.`);
+                    alert(`All questions on ${selectedSubject} were answered.\nPlease select another subject.`);
                     }
                 })
                 .catch(err => console.error(err));
@@ -79,7 +80,7 @@
                     btn.style.backgroundColor = '';
                 });
                 // Color the pressed button
-                    button.style.backgroundColor = '#f0b400'; // или другой цвет
+                button.style.backgroundColor = '#f0b400'; // или другой цвет
 
                 // Fetch-request: question availability check
                 fetch(`/check-level?subject=${selectedSubject}&level=${level}`)
@@ -90,11 +91,41 @@
                         // Display the question
                         document.getElementById('question-container').innerHTML = `
                             <h2>${data.question}</h2>
-                            <button>${data.options.a}</button>
-                            <button>${data.options.b}</button>
-                            <button>${data.options.c}</button>
-                            <button>${data.options.d}</button>
+                            <button class="answer-btn" data-option="a">${data.options.a}</button>
+                            <button class="answer-btn" data-option="b">${data.options.b}</button>
+                            <button class="answer-btn" data-option="c">${data.options.c}</button>
+                            <button class="answer-btn" data-option="d">${data.options.d}</button>
                             `;
+                            document.querySelectorAll('.answer-btn').forEach(button => {
+                                button.addEventListener('click', (e) => {
+                                    const selectedAnswer = e.target.dataset.option;
+
+                                    document.querySelectorAll('.category-btn').forEach(btn => {
+                                        btn.style.backgroundColor = '';
+                                    });
+                                    // Color the pressed answer
+                                    button.style.backgroundColor = '#f0b400'; // или другой цвет
+                                    
+                                    // Clear selected levels' colors
+                                    document.querySelectorAll('.level-btn').forEach(btn => {
+                                        btn.style.backgroundColor = '';
+                                    });
+                                    // Clear previously displayed question (if any)
+                                    document.getElementById('question-container').innerHTML = '';    
+
+
+                                    fetch(`/check-answer?subject=${selectedSubject}&level=${level}&correctAnswer=${selectedAnswer}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.correctAns) {
+                                        alert(`Correct answer! \nPlease select a new question.`);
+                                        } else {
+                                        alert(`Incorrect! Try again or select a new question.`);
+                                        }
+                                    })
+                                    .catch(err => console.error(err));
+                                });
+                                });
                     } else {
                     alert(`This question has been answered. Try another one`);
                     }
@@ -102,6 +133,11 @@
                 .catch(err => console.error(err));
             });
             });
+
+            //NEW CODE
+
+           
+
         </script>
     </body>
 </html>

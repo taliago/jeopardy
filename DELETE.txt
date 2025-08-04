@@ -18,12 +18,15 @@ DONE:
  - Model\Schema of collection
  - Load docs from csv to db (loadQuestion.js)
  - Write HTML (index.html)
+ - Accepts answer and says if correct, only counts a question Answered if the answer was correct (maybe
+    we should change that?)
 
 
 
 TO-DO:
  - Write logic of the game - in a separate file
- - In HTML - change color of (levels, themes) depend on there availability
+ -Points system, when the game ends
+ - In HTML - change color of (levels, subjects) depend on their availability
  - Now coloring is written in script (HTML), maybe we should do it in CSS
  - CSS - optional
  - comments on all code - optional
