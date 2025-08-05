@@ -43,9 +43,15 @@ app.get('/', (req, res) => {
 // Check subject availability 
 app.get('/check-subject', async (req, res) => {
   const subject = req.query.subject;
-  const count = await QA.countDocuments({ subject, answered: 'N' });
-  const isAvailable = count > 0;
-  res.json({ available: isAvailable });
+  // Finds all left questions on that theme
+  const unanswered = await QA.find({ subject, answered: 'N' });
+  // Collects available levels
+  const availableLevels = unanswered.map(question => question.level);
+
+  res.json({ 
+    available: availableLevels.length > 0,
+    availableLevels
+   });
 });
 
 // Check question availability and return it to user
@@ -73,13 +79,22 @@ app.get('/check-level', async (req, res) => {
 app.get('/check-answer', async (req, res) => {
   const { subject, level, correctAnswer } = req.query;
   const question = await QA.findOne({ subject, level });
-  const isCorrect = question.correctAnswer === correctAnswer;
-  if (isCorrect) {
-    await QA.updateOne({subject, level}, {$set: {answered: 'Y'}});
-    points += parseInt(level);
-  }
-  else {
-    mistakes ++;
-  }
-  res.json({ correctAns: isCorrect, points, mistakes });
+  
+  if (question) {
+    const isCorrect = question.correctAnswer === correctAnswer;
+
+    await QA.updateOne({ subject, level }, { $set: { answered: 'Y' } });
+
+    if (isCorrect) {
+      points += parseInt(level);
+    }
+    else {
+      mistakes ++;
+    }
+
+    // Check if there are any questions left
+    const unansweredLeft = await QA.exists({ answered: 'N' });
+
+    res.json({ correctAns: isCorrect, points, mistakes, gameOver: !unansweredLeft });
+  } 
 });

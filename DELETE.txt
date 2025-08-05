@@ -19,16 +19,28 @@ DONE:
  - Load docs from csv to db (loadQuestion.js)
  - Write HTML (index.html)
  - Accepts answer and says if correct, only counts a question Answered if the answer was correct (maybe
-    we should change that?)
+    we should change that?) - DONE. Now it counts all questions
+ - In HTML - change color of (levels, subjects) depend on their availability
+ - Now coloring is written in script (HTML), maybe we should do it in CSS
+ - Ends the game when all answered
+ - Added lives counter
+ - Display reaction to the answer in HTML (not alert)
+ - IMPORTANT! (Done, but better to check) Prevent game after 4 mistakes. Now you can continue following the link.
+ - IMPORTANT: Separate Game Over for victory
+ - Points system, when the game ends
 
 
 
 TO-DO:
- - Write logic of the game - in a separate file
- - Points system, when the game ends
- - In HTML - change color of (levels, subjects) depend on their availability
- - Now coloring is written in script (HTML), maybe we should do it in CSS
+
+ - I suggest to add comments where we "used" AI. Like sessions and such.
+   Things we didn't cover in course
+   
+ - Write logic of the game - in a separate (from html and server) file
+
+ - Make a restart to the game - optional
  - CSS - optional
+ - Add pictures - optional
  - comments on all code - optional
  - Write note that explains the code (ReadMe) - Sara asked to do
 
