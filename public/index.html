@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Trivia Game</title>
+    </head>
+    <body>
+        <!--Subjects-->
+        <div class="category-row" id="subject-buttons">
+            <button class="category-btn">History</button>
+            <button class="category-btn">Geography</button>
+            <button class="category-btn">Computer</button>
+        </div>
+
+        <!--Levels-->
+        <div class="level-row" id="level-buttons">
+            <button class="level-btn">100</button>
+            <button class="level-btn">200</button>
+            <button class="level-btn">300</button>
+            <button class="level-btn">400</button>
+            <button class="level-btn">500</button>
+        </div>
+
+        <div id="question-container"></div>
+
+        <!-- <button class="submit">View Options</button>-->
+
+
+        <script>
+
+            // When user сhooses a subject
+            let selectedSubject = null;
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.disabled = true;
+            });
+
+            document.querySelectorAll('.category-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                selectedSubject = button.textContent;
+                document.querySelectorAll('.level-btn').forEach(btn => {
+                    btn.disabled = false;
+                });
+
+                // CLEARING & COLORING :)
+                // Clear all category colors
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.style.backgroundColor = '';
+                });
+                // Color the pressed category
+                button.style.backgroundColor = '#f0b400'; // или другой цвет
+                
+                // Clear selected levels' colors
+                document.querySelectorAll('.level-btn').forEach(btn => {
+                    btn.style.backgroundColor = '';
+                });
+                // Clear previously displayed question (if any)
+                document.getElementById('question-container').innerHTML = '';
+                
+                // Fetch-request: theme availability check
+                fetch(`/check-subject?subject=${selectedSubject}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.available) {
+                    } else {
+                    alert(`All questions on ${selectedSubject} were answered.\nPlease select another subject.`);
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+            });
+
+            // When user сhooses a level
+            document.querySelectorAll('.level-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // If the subject is not selected
+                if (!selectedSubject) {
+                alert('Please choose a subject first.');
+                return;
+                }
+                
+                const level = button.textContent;
+
+                // CLEARING & COLORING :)
+                // Clear all levels' colors
+                document.querySelectorAll('.level-btn').forEach(btn => {
+                    btn.style.backgroundColor = '';
+                });
+                // Color the pressed button
+                button.style.backgroundColor = '#f0b400'; // или другой цвет
+
+                // Fetch-request: question availability check
+                fetch(`/check-level?subject=${selectedSubject}&level=${level}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.available) {
+
+                        // Display the question
+                        document.getElementById('question-container').innerHTML = `
+                            <h2>${data.question}</h2>
+                            <button class="answer-btn" data-option="a">${data.options.a}</button>
+                            <button class="answer-btn" data-option="b">${data.options.b}</button>
+                            <button class="answer-btn" data-option="c">${data.options.c}</button>
+                            <button class="answer-btn" data-option="d">${data.options.d}</button>
+                            `;
+                            document.querySelectorAll('.answer-btn').forEach(button => {
+                                button.addEventListener('click', (e) => {
+                                    const selectedAnswer = e.target.dataset.option;
+
+                                    document.querySelectorAll('.category-btn').forEach(btn => {
+                                        btn.style.backgroundColor = '';
+                                    });
+                                    // Color the pressed answer
+                                    button.style.backgroundColor = '#f0b400'; // или другой цвет
+                                    
+                                    // Clear selected levels' colors
+                                    document.querySelectorAll('.level-btn').forEach(btn => {
+                                        btn.style.backgroundColor = '';
+                                    });
+                                    // Clear previously displayed question (if any)
+                                    document.getElementById('question-container').innerHTML = '';    
+
+                                    document.querySelectorAll('.level-btn').forEach(btn => {
+                                        btn.disabled = true;
+                                    });
+
+
+                                    fetch(`/check-answer?subject=${selectedSubject}&level=${level}&correctAnswer=${selectedAnswer}`)
+                                    .then(res => res.json())
+                                    .then(data => {
+                                        if (data.correctAns) {
+                                        alert(`Correct answer! You have ${data.points} points. \nPlease select a new question.`);
+                                        } else {
+                                            if (data.mistakes == 4) {
+                                                alert("You have 4 mistakes! Redirecting to the game over page.");
+                                                sessionStorage.setItem('points', data.points);
+                                                window.location.href = '/gameOver.html'; 
+                                            }
+                                            else {
+                                                alert(`Incorrect! You have ${data.mistakes} mistakes. \nSelect a new question.`);
+
+                                            }
+                                        }
+                                    })
+                                    .catch(err => console.error(err));
+                                });
+                                });
+                    } else {
+                    alert(`This question has been answered. Try another one`);
+                    }
+                })
+                .catch(err => console.error(err));
+            });
+            });
+
+            //NEW CODE
+
+           
+
+        </script>
+    </body>
+</html>

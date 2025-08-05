@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Game Over!</title>
+    </head>
+    <body>
+        <h1>Game Over!</h1>
+        <p>You've reached the maximum number of mistakes.</p>
+        <p id="score"></p>
+    </body>
+    <script>
+        const score = sessionStorage.getItem('points');
+        document.getElementById('score').textContent = `You ended the game with a score of ${score}`;
+    </script>
+</html>
