@@ -8,9 +8,14 @@ const loadQuestions = require('./scripts/loadQuestions');
 const app = express();
 const PORT = 3000;
 
+app.use(express.static('public'));
+
 // Middleware functions
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+let points = 0;
+let mistakes = 0;
 
 
 // Route for HTML page
@@ -35,7 +40,7 @@ app.get('/', (req, res) => {
     process.exit(1);
   });
 
-// Check theme availability 
+// Check subject availability 
 app.get('/check-subject', async (req, res) => {
   const subject = req.query.subject;
   const count = await QA.countDocuments({ subject, answered: 'N' });
@@ -62,4 +67,19 @@ app.get('/check-level', async (req, res) => {
   } else {
     res.json({ available: false });
   }
+});
+
+// check if answer is right
+app.get('/check-answer', async (req, res) => {
+  const { subject, level, correctAnswer } = req.query;
+  const question = await QA.findOne({ subject, level });
+  const isCorrect = question.correctAnswer === correctAnswer;
+  if (isCorrect) {
+    await QA.updateOne({subject, level}, {$set: {answered: 'Y'}});
+    points += parseInt(level);
+  }
+  else {
+    mistakes ++;
+  }
+  res.json({ correctAns: isCorrect, points, mistakes });
 });
