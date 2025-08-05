@@ -2,15 +2,30 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+        <link rel="stylesheet" href="style.css" />
         <title>Game Over!</title>
     </head>
     <body>
         <h1>Game Over!</h1>
-        <p>You've reached the maximum number of mistakes.</p>
-        <p id="score"></p>
+        <div id="result-container">
+            <p id="message"></p>
+            <p id="finalScore"></p>
+        </div>
+        <script>
+            const finalScore = sessionStorage.getItem('points');
+            const reason = sessionStorage.getItem('endReason');
+
+            const message = document.getElementById('message');
+           
+            if (reason === 'completed') {
+                
+                message.textContent = "🎉 Congratulations! You've completed all the questions!";
+            } else if (reason === 'mistakes') {
+                message.textContent = "❌ You've made 4 mistakes. Better luck next time!";
+            } else {
+                message.textContent = "Game ended.";
+            }
+                document.getElementById('finalScore').textContent = `Your final score: ${finalScore}`;
+        </script>
     </body>
-    <script>
-        const score = sessionStorage.getItem('points');
-        document.getElementById('score').textContent = `You ended the game with a score of ${score}`;
-    </script>
 </html>

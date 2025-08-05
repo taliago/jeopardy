@@ -2,9 +2,11 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
+        <link rel="stylesheet" href="style.css" />
         <title>Trivia Game</title>
     </head>
     <body>
+        <h1>Trivia Game</h1>
         <!--Subjects-->
         <div class="category-row" id="subject-buttons">
             <button class="category-btn">History</button>
@@ -21,38 +23,36 @@
             <button class="level-btn">500</button>
         </div>
 
+        <!--Lives-->
+        <div id="lives-counter">Lives left: 4</div>
+
+        <!--Message to User-->
+        <div id="message-box"></div>
+
+        <!--Questions-->
         <div id="question-container"></div>
-
-        <!-- <button class="submit">View Options</button>-->
-
 
         <script>
 
+            let gameEnded = sessionStorage.getItem('gameEnded') === 'true';
             // When user сhooses a subject
             let selectedSubject = null;
-            document.querySelectorAll('.level-btn').forEach(btn => {
-                btn.disabled = true;
-            });
+
+            resetLevelButtons();
 
             document.querySelectorAll('.category-btn').forEach(button => {
             button.addEventListener('click', () => {
-                selectedSubject = button.textContent;
-                document.querySelectorAll('.level-btn').forEach(btn => {
-                    btn.disabled = false;
-                });
+                if (gameEnded) return;
 
-                // CLEARING & COLORING :)
-                // Clear all category colors
-                document.querySelectorAll('.category-btn').forEach(btn => {
-                    btn.style.backgroundColor = '';
-                });
-                // Color the pressed category
-                button.style.backgroundColor = '#f0b400'; // или другой цвет
+                // Save the selected subject text
+                selectedSubject = button.textContent;
                 
-                // Clear selected levels' colors
-                document.querySelectorAll('.level-btn').forEach(btn => {
-                    btn.style.backgroundColor = '';
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('selected');
                 });
+                button.classList.add('selected');
+                document.getElementById('message-box').textContent = '';
+
                 // Clear previously displayed question (if any)
                 document.getElementById('question-container').innerHTML = '';
                 
@@ -60,10 +60,12 @@
                 fetch(`/check-subject?subject=${selectedSubject}`)
                 .then(res => res.json())
                 .then(data => {
-                    if (data.available) {
-                    } else {
-                    alert(`All questions on ${selectedSubject} were answered.\nPlease select another subject.`);
+                    if (!data.available) {
+                        alert(`All questions on ${selectedSubject} were answered.\nPlease select another subject.`);
+                        return;
                     }
+                    // Color levels in green and red according to availability
+                    updateLevelButtons(data.availableLevels);
                 })
                 .catch(err => console.error(err));
             });
@@ -72,21 +74,24 @@
             // When user сhooses a level
             document.querySelectorAll('.level-btn').forEach(button => {
             button.addEventListener('click', () => {
+
+                if (gameEnded) return;
+
                 // If the subject is not selected
                 if (!selectedSubject) {
-                alert('Please choose a subject first.');
-                return;
+                    alert('Please choose a subject first.');
+                    return;
                 }
                 
+                // Save the selected level text
                 const level = button.textContent;
 
                 // CLEARING & COLORING :)
-                // Clear all levels' colors
                 document.querySelectorAll('.level-btn').forEach(btn => {
-                    btn.style.backgroundColor = '';
+                    btn.classList.remove('selected');
                 });
-                // Color the pressed button
-                button.style.backgroundColor = '#f0b400'; // или другой цвет
+                button.classList.add('selected');
+
 
                 // Fetch-request: question availability check
                 fetch(`/check-level?subject=${selectedSubject}&level=${level}`)
@@ -102,44 +107,70 @@
                             <button class="answer-btn" data-option="c">${data.options.c}</button>
                             <button class="answer-btn" data-option="d">${data.options.d}</button>
                             `;
+
                             document.querySelectorAll('.answer-btn').forEach(button => {
                                 button.addEventListener('click', (e) => {
                                     const selectedAnswer = e.target.dataset.option;
-
-                                    document.querySelectorAll('.category-btn').forEach(btn => {
-                                        btn.style.backgroundColor = '';
-                                    });
-                                    // Color the pressed answer
-                                    button.style.backgroundColor = '#f0b400'; // или другой цвет
-                                    
-                                    // Clear selected levels' colors
-                                    document.querySelectorAll('.level-btn').forEach(btn => {
-                                        btn.style.backgroundColor = '';
-                                    });
+             
                                     // Clear previously displayed question (if any)
                                     document.getElementById('question-container').innerHTML = '';    
+                                    resetLevelButtons();
+
 
                                     document.querySelectorAll('.level-btn').forEach(btn => {
                                         btn.disabled = true;
                                     });
 
-
+                                    // Fetch-request: checking answer
                                     fetch(`/check-answer?subject=${selectedSubject}&level=${level}&correctAnswer=${selectedAnswer}`)
                                     .then(res => res.json())
                                     .then(data => {
+                                        // Back to "main menu"
+                                        selectedSubject = null;
+                                        document.querySelectorAll('.category-btn').forEach(btn => {
+                                            btn.classList.remove('selected');
+                                        });
+
+                                        updateLives(data.mistakes);
+
                                         if (data.correctAns) {
-                                        alert(`Correct answer! You have ${data.points} points. \nPlease select a new question.`);
+                                            showMessage(`✅ Correct! You have ${data.points} points.`, true);
                                         } else {
-                                            if (data.mistakes == 4) {
-                                                alert("You have 4 mistakes! Redirecting to the game over page.");
+                                            if (data.gameOver || data.mistakes >= 4) {
+                                                gameEnded = true;
+                                               
                                                 sessionStorage.setItem('points', data.points);
+                                                sessionStorage.setItem('gameEnded', 'true');
+
+                                                if (data.mistakes >= 4) {
+                                                    showMessage(`❌ You have 4 mistakes! Game over.`, false);
+                                                    sessionStorage.setItem('endReason', 'mistakes');
+                                                } else {
+                                                    showMessage("🎉 All questions have been answered! The game is over.", true);
+                                                    sessionStorage.setItem('endReason', 'completed');
+                                                }
+
                                                 window.location.href = '/gameOver.html'; 
+                                                return;
                                             }
                                             else {
-                                                alert(`Incorrect! You have ${data.mistakes} mistakes. \nSelect a new question.`);
-
+                                                showMessage(`❌ Incorrect. You have ${data.mistakes} mistake(s).`, false);
                                             }
+                                        } 
+
+                                        if (data.gameOver) {
+                                            alert("All questions have been answered! The game is over.");
+
+                                            sessionStorage.setItem('points', data.points);
+                                            sessionStorage.setItem('gameEnded', 'true');
+                                            sessionStorage.setItem('endReason', 'completed');
+
+                                            window.location.href = '/gameOver.html';
+                                            return;
                                         }
+
+                                        resetLevelButtons();
+                                        
                                     })
                                     .catch(err => console.error(err));
                                 });
@@ -152,9 +183,42 @@
             });
             });
 
-            //NEW CODE
+            // CLEARING & COLORING function :)
+            function updateLevelButtons(availableLevels) {
+                document.querySelectorAll('.level-btn').forEach(btn => {
+                    const level = parseInt(btn.textContent);
 
-           
+                    btn.classList.remove('level-available', 'level-unavailable', 'selected');
+
+                    if (availableLevels.includes(level)) {
+                        btn.disabled = false;
+                        btn.classList.add('level-available');
+                    } else {
+                        btn.disabled = true;
+                        btn.classList.add('level-unavailable');
+                    }
+                });
+            }
+
+            function resetLevelButtons() {
+                document.querySelectorAll('.level-btn').forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.remove('level-available', 'level-unavailable', 'selected');
+                    btn.classList.add('level-unavailable');
+                });
+            }
+
+            function updateLives(mistakes) {
+                const livesLeft = 4 - mistakes;
+                document.getElementById('lives-counter').textContent = `Lives left: ${livesLeft}`;
+            }
+
+            function showMessage(message, isCorrect) {
+                const box = document.getElementById('message-box');
+                box.textContent = message;
+                box.style.color = isCorrect ? 'green' : 'red';
+            }
+
 
         </script>
     </body>
