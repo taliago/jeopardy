@@ -25,7 +25,7 @@ DONE:
 
 TO-DO:
  - Write logic of the game - in a separate file
- -Points system, when the game ends
+ - Points system, when the game ends
  - In HTML - change color of (levels, subjects) depend on their availability
  - Now coloring is written in script (HTML), maybe we should do it in CSS
  - CSS - optional

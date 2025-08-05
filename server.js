@@ -8,9 +8,14 @@ const loadQuestions = require('./scripts/loadQuestions');
 const app = express();
 const PORT = 3000;
 
+app.use(express.static('public'));
+
 // Middleware functions
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+let points = 0;
+let mistakes = 0;
 
 
 // Route for HTML page
@@ -71,6 +76,10 @@ app.get('/check-answer', async (req, res) => {
   const isCorrect = question.correctAnswer === correctAnswer;
   if (isCorrect) {
     await QA.updateOne({subject, level}, {$set: {answered: 'Y'}});
+    points += parseInt(level);
   }
-  res.json({ correctAns: isCorrect });
+  else {
+    mistakes ++;
+  }
+  res.json({ correctAns: isCorrect, points, mistakes });
 });
