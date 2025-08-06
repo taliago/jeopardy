@@ -1,80 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="style.css" />
-        <title>Trivia Game</title>
-    </head>
-    <body>
-        <h1>Trivia Game</h1>
-        <!--Subjects-->
-        <div class="category-row" id="subject-buttons">
-            <button class="category-btn">History</button>
-            <button class="category-btn">Geography</button>
-            <button class="category-btn">Computer</button>
-        </div>
 
-        <!--Levels-->
-        <div class="level-row" id="level-buttons">
-            <button class="level-btn">100</button>
-            <button class="level-btn">200</button>
-            <button class="level-btn">300</button>
-            <button class="level-btn">400</button>
-            <button class="level-btn">500</button>
-        </div>
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Trivia Game</title>
+</head>
 
-        <!--Lives-->
-        <div id="lives-counter">Lives left: 4</div>
+<body>
+    <h1>Trivia Game</h1>
 
-        <!--Message to User-->
-        <div id="message-box"></div>
+    <!--Lives-->
+    <div id="lives-counter">Lives left: 4</div>
+    <br />
+    <!--Subjects-->
+    <div class="category-row" id="subject-buttons">
+        <button class="category-btn">History</button>
+        <button class="category-btn">Geography</button>
+        <button class="category-btn">Computer</button>
+    </div>
 
-        <!--Questions-->
-        <div id="question-container"></div>
+    <!--Levels-->
+    <div class="level-row" id="level-buttons">
+        <button class="level-btn">100</button>
+        <button class="level-btn">200</button>
+        <button class="level-btn">300</button>
+        <button class="level-btn">400</button>
+        <button class="level-btn">500</button>
+    </div>
 
-        <script>
+    <!--Message to User-->
+    <div id="message-box"></div>
 
-            let gameEnded = sessionStorage.getItem('gameEnded') === 'true';
-            // When user сhooses a subject
-            let selectedSubject = null;
+    <!--Questions-->
+    <div id="question-container"></div>
+    <br />
+    <button onclick="restartGame()">Play Again</button>
 
-            resetLevelButtons();
+    <script>
 
-            document.querySelectorAll('.category-btn').forEach(button => {
+        // GPT help: checks the saved game state from the server. Is it over or not.
+        // And redirecting user if game already ended to prevent re-entry
+
+        if (sessionStorage.getItem('gameEnded') === 'true') {
+            window.location.href = '/gameOver.html';
+        }
+
+        let gameEnded = false;
+        let selectedSubject = null;
+
+        // Like "back to main menu"
+        resetLevelButtons();
+
+        // USER CHOSES A SUBJECT
+        document.querySelectorAll('.category-btn').forEach(button => {
             button.addEventListener('click', () => {
+                // Check if the game is over
                 if (gameEnded) return;
 
-                // Save the selected subject text
+                // Save the selected subject text to use it in fetch request
                 selectedSubject = button.textContent;
-                
+
+                // Remove selection from category buttons
                 document.querySelectorAll('.category-btn').forEach(btn => {
                     btn.classList.remove('selected');
                 });
+                // Add selection only to selected button
                 button.classList.add('selected');
+
+                // Clear previously displayed questions and messages (if any)
                 document.getElementById('message-box').textContent = '';
-
-                // Clear previously displayed question (if any)
                 document.getElementById('question-container').innerHTML = '';
-                
-                // Fetch-request: theme availability check
+
+                // Fetch-request to server: subject availability check
                 fetch(`/check-subject?subject=${selectedSubject}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (!data.available) {
-                        alert(`All questions on ${selectedSubject} were answered.\nPlease select another subject.`);
-                        return;
-                    }
-                    // Color levels in green and red according to availability
-                    updateLevelButtons(data.availableLevels);
-                })
-                .catch(err => console.error(err));
+                    .then(res => res.json()) // receiving response from the server
+                    .then(data => {
+                        // In case there are NO questions left on that subject
+                        if (!data.available) {
+                            alert(`All questions on ${selectedSubject} were answered.\nPlease select another subject.`);
+                            return;
+                        }
+                        // In case there are questions left
+                        // Color levels in green and red according to availability
+                        updateLevelButtons(data.availableLevels);
+                    })
+                    .catch(concole.error);
             });
-            });
+        });
 
-            // When user сhooses a level
-            document.querySelectorAll('.level-btn').forEach(button => {
+        // USER CHOSES A LEVEL
+        document.querySelectorAll('.level-btn').forEach(button => {
             button.addEventListener('click', () => {
-
+                // Check if the game is over 
                 if (gameEnded) return;
 
                 // If the subject is not selected
@@ -82,144 +100,157 @@
                     alert('Please choose a subject first.');
                     return;
                 }
-                
-                // Save the selected level text
+
+                // Save the selected level text to use it in fetch request
                 const level = button.textContent;
 
-                // CLEARING & COLORING :)
+                // Remove selection from all level buttons
                 document.querySelectorAll('.level-btn').forEach(btn => {
                     btn.classList.remove('selected');
                 });
+                // Add selection only to selected button
                 button.classList.add('selected');
 
-
-                // Fetch-request: question availability check
+                // Fetch-request to server: question availability check by subject AND level
                 fetch(`/check-level?subject=${selectedSubject}&level=${level}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.available) {
+                    .then(res => res.json()) // receiving response from the server
+                    .then(data => {
+                        if (data.available) {
 
-                        // Display the question
-                        document.getElementById('question-container').innerHTML = `
-                            <h2>${data.question}</h2>
-                            <button class="answer-btn" data-option="a">${data.options.a}</button>
-                            <button class="answer-btn" data-option="b">${data.options.b}</button>
-                            <button class="answer-btn" data-option="c">${data.options.c}</button>
-                            <button class="answer-btn" data-option="d">${data.options.d}</button>
+                            // Display the question
+                            document.getElementById('question-container').innerHTML = `
+                            <div style="text-align: center">
+                                <h2>${data.question}</h2>
+                                <button class="answer-btn" data-option="a">${data.options.a}</button>
+                                <button class="answer-btn" data-option="b">${data.options.b}</button>
+                                <button class="answer-btn" data-option="c">${data.options.c}</button>
+                                <button class="answer-btn" data-option="d">${data.options.d}</button>
+                            </div>
                             `;
 
+                            // USER CHOSES THE ANSWER
                             document.querySelectorAll('.answer-btn').forEach(button => {
                                 button.addEventListener('click', (e) => {
+                                    // Save the selected answer to use it in fetch request
                                     const selectedAnswer = e.target.dataset.option;
-             
-                                    // Clear previously displayed question (if any)
-                                    document.getElementById('question-container').innerHTML = '';    
+
+                                    // Clear previously displayed question (if any) 
+                                    document.getElementById('question-container').innerHTML = '';
+                                    // And clear buttons
                                     resetLevelButtons();
-
-
                                     document.querySelectorAll('.level-btn').forEach(btn => {
                                         btn.disabled = true;
                                     });
 
-                                    // Fetch-request: checking answer
-                                    fetch(`/check-answer?subject=${selectedSubject}&level=${level}&correctAnswer=${selectedAnswer}`)
-                                    .then(res => res.json())
-                                    .then(data => {
-                                        // Back to "main menu"
-                                        selectedSubject = null;
-                                        document.querySelectorAll('.category-btn').forEach(btn => {
-                                            btn.classList.remove('selected');
-                                        });
+                                    // Fetch-request to server: checking answer using subject, level and selected answer
+                                    fetch(`/check-answer?subject=${selectedSubject}&level=${level}&selectedAnswer=${selectedAnswer}`)
+                                        .then(res => res.json()) // receiving response from the server
+                                        .then(data => {
+                                            // Back to "main menu". Clears buttons, selected subject
+                                            selectedSubject = null;
+                                            document.querySelectorAll('.category-btn').forEach(btn => {
+                                                btn.classList.remove('selected');
+                                            });
+                                            // Updates lives' display
+                                            updateLives(data.mistakes);
 
-                                        updateLives(data.mistakes);
+                                            // Display message based on the answer
+                                            if (data.correctAns) {
+                                                showMessage(`Correct! You have ${data.points} points.`, true);
+                                            } else {
+                                                showMessage(`Incorrect. You have ${data.mistakes} mistake(s).`, false);
+                                            }
 
-                                        if (data.correctAns) {
-                                            showMessage(`✅ Correct! You have ${data.points} points.`, true);
-                                        } else {
+                                            // Handle the end of the game
+
                                             if (data.gameOver || data.mistakes >= 4) {
                                                 gameEnded = true;
-                                               
+
+                                                // GPT help: sessionStorage used here to pass points and game state to gameOver page
                                                 sessionStorage.setItem('points', data.points);
                                                 sessionStorage.setItem('gameEnded', 'true');
 
-                                                if (data.mistakes >= 4) {
-                                                    showMessage(`❌ You have 4 mistakes! Game over.`, false);
-                                                    sessionStorage.setItem('endReason', 'mistakes');
-                                                } else {
-                                                    showMessage("🎉 All questions have been answered! The game is over.", true);
-                                                    sessionStorage.setItem('endReason', 'completed');
-                                                }
+                                                // Defines the reason of the end
+                                                const reason = data.mistakes >= 4 ? 'mistakes' : 'completed';
+                                                sessionStorage.setItem('endReason', reason);
 
-                                                window.location.href = '/gameOver.html'; 
+                                                // Go to the final page
+                                                window.location.href = '/gameOver.html';
                                                 return;
                                             }
-                                            else {
-                                                showMessage(`❌ Incorrect. You have ${data.mistakes} mistake(s).`, false);
-                                            }
-                                        } 
-
-                                        if (data.gameOver) {
-                                            alert("All questions have been answered! The game is over.");
-
-                                            sessionStorage.setItem('points', data.points);
-                                            sessionStorage.setItem('gameEnded', 'true');
-                                            sessionStorage.setItem('endReason', 'completed');
-
-                                            window.location.href = '/gameOver.html';
-                                            return;
-                                        }
-
-                                        resetLevelButtons();
-                                        
-                                    })
-                                    .catch(err => console.error(err));
+                                            resetLevelButtons();
+                                        })
+                                        .catch(concole.error);
                                 });
-                                });
+                            });
+                        } else {
+                            alert(`This question has been answered. Try another one`);
+                        }
+                    })
+                    .catch(console.error);
+            });
+        });
+
+        // CLEARING & COLORING function :)
+        function updateLevelButtons(availableLevels) {
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                const level = parseInt(btn.textContent);
+                // Removes unnecessary classes
+                btn.classList.remove('level-available', 'level-unavailable', 'selected');
+
+                // Color levels in green and red according to availability
+                if (availableLevels.includes(level)) {
+                    btn.disabled = false;
+                    btn.classList.add('level-available');
+                } else {
+                    btn.disabled = true;
+                    btn.classList.add('level-unavailable');
+                }
+            });
+        }
+
+
+        // Update styling of level buttons. Removes and adds classes
+        function resetLevelButtons() {
+            document.querySelectorAll('.level-btn').forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('level-available', 'level-unavailable', 'selected');
+                btn.classList.add('level-unavailable');
+            });
+        }
+
+        // Update lives counter based on number of mistakes
+        function updateLives(mistakes) {
+            const livesLeft = 4 - mistakes;
+            document.getElementById('lives-counter').textContent = `Lives left: ${livesLeft}`;
+        }
+
+        // Show message to user for user-frendly experience
+        function showMessage(message, isCorrect) {
+            const box = document.getElementById('message-box');
+            box.textContent = message;
+            box.style.color = isCorrect ? 'green' : 'red';
+        }
+
+        function restartGame() {
+            fetch('/restart-game', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // GPT help: ressets game session state
+                        sessionStorage.clear();
+                        // Go to index.html
+                        window.location.href = '/';
                     } else {
-                    alert(`This question has been answered. Try another one`);
+                        alert('Failed to restart the game.');
                     }
                 })
-                .catch(err => console.error(err));
-            });
-            });
-
-            // CLEARING & COLORING function :)
-            function updateLevelButtons(availableLevels) {
-                document.querySelectorAll('.level-btn').forEach(btn => {
-                    const level = parseInt(btn.textContent);
-
-                    btn.classList.remove('level-available', 'level-unavailable', 'selected');
-
-                    if (availableLevels.includes(level)) {
-                        btn.disabled = false;
-                        btn.classList.add('level-available');
-                    } else {
-                        btn.disabled = true;
-                        btn.classList.add('level-unavailable');
-                    }
+                .catch(err => {
+                    console.error(err);
                 });
-            }
+        }
 
-            function resetLevelButtons() {
-                document.querySelectorAll('.level-btn').forEach(btn => {
-                    btn.disabled = true;
-                    btn.classList.remove('level-available', 'level-unavailable', 'selected');
-                    btn.classList.add('level-unavailable');
-                });
-            }
+    </script>
+</body>
 
-            function updateLives(mistakes) {
-                const livesLeft = 4 - mistakes;
-                document.getElementById('lives-counter').textContent = `Lives left: ${livesLeft}`;
-            }
-
-            function showMessage(message, isCorrect) {
-                const box = document.getElementById('message-box');
-                box.textContent = message;
-                box.style.color = isCorrect ? 'green' : 'red';
-            }
-
-
-        </script>
-    </body>
 </html>
