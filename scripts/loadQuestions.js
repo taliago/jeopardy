@@ -3,8 +3,8 @@ const csv = require('csv-parser');
 const mongoose = require('mongoose');
 const path = require('path');
 const Questions = require('../models/questionModel'); // imports schema of collection - questions
-// const connectDB = require('../server'); // imports connection to DB model
-// We don't need a server here, bc were call for loadQuestions from the server. 
+
+// We don't need a server here, bc we call for loadQuestions from the server. 
 // So server is the main part, that connects everything.
 
 async function loadQuestions() {   
@@ -17,15 +17,7 @@ async function loadQuestions() {
             await mongoose.connection.db.dropCollection('questions');
             console.log('Dropped existing questions collection');
         }
-
-        // inserts data only once - probably not needed
-        /* 
-        const count = await Questions.countDocuments();
-        if (count > 0) {
-            console.log('Questions already exist in db - jeopardy.');
-            return;
-        } */
-
+        
         const questions = [];
 
         await new Promise((resolve, reject) => {
