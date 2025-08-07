@@ -34,6 +34,7 @@
         // Display the final score, no matter what
         document.getElementById('finalScore').textContent = `Your final score: ${finalScore}`;
 
+        //method for button to restart game
         function restartGame() {
             fetch('/restart-game', { method: 'POST' })
                 .then(res => res.json())

@@ -35,14 +35,16 @@
     <!--Questions-->
     <div id="question-container"></div>
     <br />
-    <button onclick="restartGame()">Play Again</button>
+    
 
     <script>
 
         // GPT help: checks the saved game state from the server. Is it over or not.
         // And redirecting user if game already ended to prevent re-entry
 
+        console.log('Checking if game has ended...');
         if (sessionStorage.getItem('gameEnded') === 'true') {
+            console.log('Game ended, redirecting...');
             window.location.href = '/gameOver.html';
         }
 
@@ -52,11 +54,12 @@
         // Like "back to main menu"
         resetLevelButtons();
 
-        // USER CHOSES A SUBJECT
+        // USER CHOOSES A SUBJECT
         document.querySelectorAll('.category-btn').forEach(button => {
             button.addEventListener('click', () => {
                 // Check if the game is over
-                if (gameEnded) return;
+                if (gameEnded) 
+                    return;
 
                 // Save the selected subject text to use it in fetch request
                 selectedSubject = button.textContent;
@@ -65,6 +68,7 @@
                 document.querySelectorAll('.category-btn').forEach(btn => {
                     btn.classList.remove('selected');
                 });
+
                 // Add selection only to selected button
                 button.classList.add('selected');
 
@@ -78,18 +82,18 @@
                     .then(data => {
                         // In case there are NO questions left on that subject
                         if (!data.available) {
-                            alert(`All questions on ${selectedSubject} were answered.\nPlease select another subject.`);
+                            alert(`All questions in ${selectedSubject} were answered.\nPlease select another subject.`);
                             return;
                         }
                         // In case there are questions left
                         // Color levels in green and red according to availability
                         updateLevelButtons(data.availableLevels);
                     })
-                    .catch(concole.error);
+                    .catch(console.error);
             });
         });
 
-        // USER CHOSES A LEVEL
+        // USER CHOOSES A LEVEL
         document.querySelectorAll('.level-btn').forEach(button => {
             button.addEventListener('click', () => {
                 // Check if the game is over 
@@ -128,7 +132,7 @@
                             </div>
                             `;
 
-                            // USER CHOSES THE ANSWER
+                            // USER CHOOSES THE ANSWER
                             document.querySelectorAll('.answer-btn').forEach(button => {
                                 button.addEventListener('click', (e) => {
                                     // Save the selected answer to use it in fetch request
@@ -180,7 +184,7 @@
                                             }
                                             resetLevelButtons();
                                         })
-                                        .catch(concole.error);
+                                        .catch(console.error);
                                 });
                             });
                         } else {
