@@ -8,6 +8,22 @@ body {
   background-color: #f7f7f7;
 }
 
+.center-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 30px;
+}
+
+.answer-btn {
+  display: inline-block;
+  margin: 5px;
+  padding: 10px 15px;
+  font-size: 16px;
+}
+
 button {
   margin: 5px;
   padding: 10px 15px;
@@ -15,11 +31,11 @@ button {
 }
 
 .selected {
-  background-color: orange !important;
+  background-color: rgb(255, 179, 0) !important;
 }
 
 .level-available {
-  background-color: #66ff66;
+  background-color: #72ff72;
   color: black;
 }
 
@@ -38,4 +54,3 @@ button:disabled {
   margin-top: 10px;
   font-weight: bold;
 }
-

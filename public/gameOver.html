@@ -1,31 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="style.css" />
-        <title>Game Over!</title>
-    </head>
-    <body>
-        <h1>Game Over!</h1>
-        <div id="result-container">
-            <p id="message"></p>
-            <p id="finalScore"></p>
-        </div>
-        <script>
-            const finalScore = sessionStorage.getItem('points');
-            const reason = sessionStorage.getItem('endReason');
 
-            const message = document.getElementById('message');
-           
-            if (reason === 'completed') {
-                
-                message.textContent = "🎉 Congratulations! You've completed all the questions!";
-            } else if (reason === 'mistakes') {
-                message.textContent = "❌ You've made 4 mistakes. Better luck next time!";
-            } else {
-                message.textContent = "Game ended.";
-            }
-                document.getElementById('finalScore').textContent = `Your final score: ${finalScore}`;
-        </script>
-    </body>
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Game Over!</title>
+</head>
+
+<body>
+    <h1>Game Over!</h1>
+    <div class="center-container">
+        <p id="message"></p>
+        <p id="finalScore"></p>
+        <br />
+        <button onclick="restartGame()">Play Again</button>
+    </div>
+    <script>
+
+        // GPT help: reading game result from sessionStorage
+        const finalScore = sessionStorage.getItem('points');
+        const reason = sessionStorage.getItem('endReason');
+
+        const message = document.getElementById('message');
+
+        // Display message based on the reason
+        if (reason === 'completed') {
+            message.textContent = "Congratulations! You've completed all the questions!";
+        } else if (reason === 'mistakes') {
+            message.textContent = "You've made 4 mistakes. Better luck next time!";
+        } else {
+            message.textContent = "Game ended.";
+        }
+        // Display the final score, no matter what
+        document.getElementById('finalScore').textContent = `Your final score: ${finalScore}`;
+
+        function restartGame() {
+            fetch('/restart-game', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        // GPT help: ressets game session state
+                        sessionStorage.clear();
+                        // Go to index.html
+                        window.location.href = '/';
+                    } else {
+                        alert('Failed to restart the game.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                });
+        }
+    </script>
+</body>
+
 </html>
