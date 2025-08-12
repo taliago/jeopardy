@@ -12,6 +12,8 @@
     <div class="center-container">
         <p id="message"></p>
         <p id="finalScore"></p>
+        <img id="result-image" src="" alt="result-image" style="max-width: 300px;">
+
         <br />
         <button onclick="restartGame()">Play Again</button>
     </div>
@@ -22,12 +24,15 @@
         const reason = sessionStorage.getItem('endReason');
 
         const message = document.getElementById('message');
+        const img = document.getElementById('result-image');
 
         // Display message based on the reason
         if (reason === 'completed') {
             message.textContent = "Congratulations! You've completed all the questions!";
+            img.src = '/media/win.gif';
         } else if (reason === 'mistakes') {
             message.textContent = "You've made 4 mistakes. Better luck next time!";
+            img.src = '/media/lose.gif';
         } else {
             message.textContent = "Game ended.";
         }
