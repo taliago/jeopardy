@@ -32,17 +32,79 @@ DONE:
    Things we didn't cover in course
  - Make a restart to the game - optional
  - comments on all code - optional
- - CSS - optional
+ - Ask Sara about "Show options" button - no need
  - Write logic of the game - in a separate (from html and server) file
- - Ask Sara about "Show options" button
+- Add pictures - optional
 
 
 
-
-
-TO-DO:
-
- - Add pictures - optional
+TO-DO: - ALL DONE
+ - CSS - optional
  - Write note that explains the code (ReadMe) - Sara asked to do
 
+
+  To-Do List / Task Breakdown (from ChatGPT) - will delete as we complete things
+
+
+3. Build the Server-Side Logic (Node.js/Express)
+ Set up a basic Express server.
+
+ Create routes for:
+
+ Getting available topics/difficulties
+
+ Getting a random unanswered question by topic and difficulty
+
+ Submitting an answer and updating the document's answered status
+
+ Checking the user's score and mistake count
+
+ Checking whether the game is over
+
+4. Client-Side JavaScript Logic
+ On topic/difficulty selection:
+
+ Check if unanswered questions remain.
+
+ If none: show a message to choose a different topic.
+
+ If available: fetch and display a question with 4 answers.
+
+ When user selects an answer:
+
+ Check if it’s correct
+
+ Show a message (correct / incorrect)
+
+ Update score and mistake count
+
+ Update answered field in the DB
+
+ Display current score
+
+ If 4 mistakes: end the game and show score
+
+ If all questions are answered: show end game message and score
+
+5. Game Logic
+ Track:
+
+Number of correct answers (points)
+
+Number of incorrect answers (mistakes)
+
+ Stop the game after:
+
+4 mistakes, or
+
+All questions are answered (answered = Y for all)
+
+6. Final Preparation for Submission
+ Write a brief document explaining how the app works.
+
+ Add names of both team members on the cover page.
+
+ Zip the entire project folder (code, CSV, explanation).
+
+ Upload it to the course system (Lamada) before August 15, 2025.
 
